@@ -1,22 +1,24 @@
-<!DOCTYPE html>
+
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feedback em 1 minuto - Jogo da Memória do Feedback</title>
+    <title>Feedback em 1 minuto - Aplicação com Abas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Paleta de cores baseada na imagem de exemplo */
+            /* Paleta de cores */
             --primary-pink: #F92C86;
             --dark-bg: #1A1C2C;
             --dark-card: #2A2D3E;
             --light-text: #E5E7EB;
             --subtle-text: #9CA3AF;
             --border-color: #373A4B;
+            --correct-green: #10B981;
+            --wrong-red: #EF4444;
         }
 
         body {
@@ -24,21 +26,43 @@
             background-color: var(--dark-bg);
             color: var(--light-text);
         }
-        .scene {
+
+        /* Estilos das Abas */
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            color: var(--subtle-text);
+            background-color: transparent;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            color: var(--primary-pink);
+            border-bottom-color: var(--primary-pink);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Estilos V1.0 (Explorar) */
+        .scene-v1 {
             perspective: 1000px;
             cursor: pointer;
         }
-        .card {
+        .card-v1 {
             width: 100%;
             height: 100%;
             position: relative;
             transition: transform 0.8s;
             transform-style: preserve-3d;
         }
-        .card.is-flipped {
+        .card-v1.is-flipped {
             transform: rotateY(180deg);
         }
-        .card__face {
+        .card__face-v1 {
             position: absolute;
             width: 100%;
             height: 100%;
@@ -53,12 +77,12 @@
             text-align: center;
             border: 1px solid var(--border-color);
         }
-        .card__face--front {
+        .card__face--front-v1 {
             background-color: var(--dark-card);
             color: var(--light-text);
             justify-content: center;
         }
-        .card__face--back {
+        .card__face--back-v1 {
             background: linear-gradient(145deg, #2f3247 0%, #2A2D3E 100%);
             color: var(--white);
             transform: rotateY(180deg);
@@ -66,32 +90,32 @@
             justify-content: flex-start;
             position: relative;
         }
-        .card-icon {
+        .card-icon-v1 {
             flex-shrink: 0;
         }
-        .card-icon svg {
+        .card-icon-v1 svg {
             width: 100%;
             height: 100%;
             fill: var(--primary-pink);
         }
-        .card-content-wrapper {
+        .card-content-wrapper-v1 {
             width: 100%;
             height: 100%;
             display: flex;
             flex-direction: column;
         }
-        .card__face--front h4 {
+        .card__face--front-v1 h4 {
             color: var(--primary-pink);
             font-weight: 700;
             margin-bottom: 0.75rem;
         }
-        .card__face--back h4 {
+        .card__face--back-v1 h4 {
             font-weight: 700;
             font-size: 1.125rem;
             line-height: 1.2;
             color: #FFFFFF;
         }
-        .card__face--back ul {
+        .card__face--back-v1 ul {
             list-style-type: none;
             padding: 0;
             text-align: left;
@@ -99,19 +123,91 @@
             width: 100%;
             margin-top: 1rem;
         }
-        .card__face--back li {
+        .card__face--back-v1 li {
             margin-bottom: 0.5rem;
             line-height: 1.5;
             background: rgba(0, 0, 0, 0.15);
             padding: 0.5rem;
             border-radius: 0.375rem;
         }
-        .card__face--front p {
+        .card__face--front-v1 p {
              font-size: 0.95rem;
              line-height: 1.6;
              color: var(--subtle-text);
         }
+
+        /* Estilos V2.0 (Jogar) */
+        .scene-v2 {
+            perspective: 1000px;
+        }
+        .card-v2 {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.6s, box-shadow 0.3s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        .card-v2.is-flipped {
+            transform: rotateY(180deg);
+        }
+        .card__face-v2 {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            text-align: center;
+            border: 2px solid var(--border-color);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .card__face--front-v2 {
+            background-color: var(--dark-card);
+            color: var(--light-text);
+        }
+        .card__face--back-v2 {
+            background: linear-gradient(145deg, var(--correct-green) 0%, #059669 100%);
+            color: var(--white);
+            transform: rotateY(180deg);
+        }
+        .card-v2.selected .card__face-v2 {
+            border-color: var(--primary-pink);
+            box-shadow: 0 0 15px 2px var(--primary-pink);
+        }
+        .card-v2.correct-match .card__face-v2 {
+            border-color: var(--correct-green);
+            animation: glow-green 1s forwards;
+        }
+        .card-v2.wrong-match .card__face-v2 {
+            border-color: var(--wrong-red);
+            animation: glow-red 0.8s forwards;
+        }
+        @keyframes glow-green { 50% { box-shadow: 0 0 20px 5px var(--correct-green); } }
+        @keyframes glow-red { 50% { box-shadow: 0 0 20px 5px var(--wrong-red); } }
         
+        .card__face--front-v2 h4 {
+            color: var(--primary-pink);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .card__face--front-v2 p {
+             font-size: 0.8rem;
+             line-height: 1.4;
+             color: var(--subtle-text);
+        }
+        .card__face--back-v2 p {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        /* Estilos Comuns */
         .gemini-button {
             background-color: var(--primary-pink);
             color: #FFFFFF;
@@ -119,7 +215,7 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 14px 0 rgba(249, 44, 134, 0.3);
         }
-         .gemini-button:hover:not(:disabled) {
+        .gemini-button:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px 0 rgba(249, 44, 134, 0.4);
         }
@@ -173,32 +269,45 @@
 
     <div class="max-w-7xl mx-auto text-center mb-8">
         <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-2">Feedback em 1 minuto</h1>
-        <p class="text-gray-400">Jogo da Memória do Feedback: Leia a situação e vire o card para descobrir a técnica ideal.</p>
+        <p class="text-gray-400">Escolha o seu modo: Explore os cenários ou teste os seus conhecimentos no Jogo da Memória.</p>
     </div>
 
-    <!-- Filtro de Busca -->
-    <div class="max-w-7xl mx-auto mb-8 px-4 sm:px-0">
-        <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                </svg>
-            </div>
-            <input type="text" id="search-input" class="w-full p-3 pl-10 border rounded-md focus:ring-2 transition input-area" placeholder="Pesquisar por uma situação...">
+    <!-- Abas -->
+    <div class="max-w-7xl mx-auto border-b border-gray-700 mb-8">
+        <div class="flex justify-center -mb-px">
+            <button class="tab-button active" data-tab="v1">Explorar</button>
+            <button class="tab-button" data-tab="v2">Jogar</button>
         </div>
     </div>
 
-    <div id="game-board" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        <!-- Cards serão inseridos aqui pelo JavaScript -->
-    </div>
-    
-    <!-- Mensagem de "Nenhum Resultado" -->
-    <div id="no-results" class="text-center text-gray-400 p-8 hidden mt-8">
-        <h3 class="text-xl font-semibold text-white">Não encontrou a sua situação?</h3>
-        <p class="mt-2">O recomendador com IA irá ajudá-lo! Descreva o seu caso abaixo.</p>
+    <!-- Conteúdo das Abas -->
+    <div id="v1" class="tab-content active">
+        <!-- Filtro de Busca V1 -->
+        <div class="max-w-7xl mx-auto mb-8 px-4 sm:px-0">
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <input type="text" id="search-input-v1" class="w-full p-3 pl-10 border rounded-md focus:ring-2 transition input-area" placeholder="Pesquisar por uma situação...">
+            </div>
+        </div>
+        <div id="game-board-v1" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+        <div id="no-results-v1" class="text-center text-gray-400 p-8 hidden mt-8">
+            <h3 class="text-xl font-semibold text-white">Não encontrou a sua situação?</h3>
+            <p class="mt-2">O recomendador com IA irá ajudá-lo! Descreva o seu caso abaixo.</p>
+        </div>
     </div>
 
-    <!-- Seção de Recomendação -->
+    <div id="v2" class="tab-content">
+        <div id="game-board-v2" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 max-w-7xl mx-auto"></div>
+        <div id="game-controls-v2" class="text-center mt-8">
+            <button id="reset-button-v2" class="gemini-button py-2 px-6 rounded-md hidden">Jogar Novamente</button>
+        </div>
+    </div>
+    
+    <!-- Seção de Recomendação (Comum) -->
     <div id="recommender" class="max-w-4xl mx-auto mt-16 p-8 rounded-lg">
         <h2 class="text-2xl font-bold text-center mb-2 text-white">✨ Recomendador de Feedback com IA</h2>
         <p class="text-center text-gray-400 mb-6">Descreva a sua situação e a IA da Gemini irá sugerir a melhor técnica.</p>
@@ -206,12 +315,10 @@
         <div class="text-center mt-4">
             <button id="recommendation-button" class="py-2 px-6 rounded-md gemini-button">Obter Recomendação</button>
         </div>
-        <div id="recommendation-output" class="mt-6 p-4 border rounded-md hidden output-area">
-            <!-- Recomendação aparecerá aqui -->
-        </div>
+        <div id="recommendation-output" class="mt-6 p-4 border rounded-md hidden output-area"></div>
     </div>
 
-    <!-- Seção do Simulador -->
+    <!-- Seção do Simulador (Comum) -->
     <div id="simulator" class="max-w-4xl mx-auto mt-8 p-8 rounded-lg hidden">
         <h2 class="text-2xl font-bold text-center mb-2 text-white">✨ Simulador de Conversa com IA</h2>
         <p class="text-center text-gray-400 mb-6">Pratique a sua abordagem. Escreva a sua frase de abertura abaixo.</p>
@@ -220,201 +327,82 @@
         <div class="text-center mt-4">
             <button id="simulation-button" class="py-2 px-6 rounded-md gemini-button">Simular Resposta</button>
         </div>
-        <div id="simulation-output" class="mt-6 p-4 border rounded-md hidden output-area">
-            <!-- Simulação aparecerá aqui -->
-        </div>
+        <div id="simulation-output" class="mt-6 p-4 border rounded-md hidden output-area"></div>
     </div>
 
 
     <script>
-        // Base de dados de Roteiros de Feedback
+        // --- BASE DE CONHECIMENTO COMPLETA (PARA AMBAS AS VERSÕES) ---
         const feedbackScripts = {
-            "Reconheça o Menor Progresso": {
-                title: "Reconheça o Menor Progresso",
-                howTo: [
-                    "<strong>1. Elogio Inicial:</strong> Elogie o esforço e a dedicação.",
-                    "<strong>2. Reconhecimento do Impacto:</strong> Mostre como o pequeno avanço já ajudou.",
-                    "<strong>3. Reforço Positivo:</strong> Incentive a pessoa a continuar no caminho certo."
-                ],
-                iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 3H3v18h18V3zM8 17H6v-7h2v7zm4 0h-2v-4h2v4zm4 0h-2V8h2v9z"/></svg>`
-            },
-            "Feedback Big Mac": {
-                title: "Feedback Big Mac",
-                howTo: [
-                    "<strong>1. Elogio Genuíno:</strong> Comece com um ponto forte específico.",
-                    "<strong>2. Ponto de Melhoria:</strong> Apresente o ponto a ser desenvolvido de forma clara.",
-                    "<strong>3. Reforço Positivo:</strong> Termine com uma palavra de incentivo e confiança."
-                ],
-                iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 13V11H5V13H19ZM19 7V5H5V7H19ZM21 15H3V14C3 12.9 3.9 12 5 12H19C20.1 12 21 12.9 21 14V15ZM21 9H3V8C3 6.9 3.9 6 5 6H19C20.1 6 21 6.9 21 8V9ZM21 17H3V19H21V17Z"/></svg>`
-            },
-            "Feedback da Autonomia": {
-                title: "Feedback da Autonomia",
-                howTo: [
-                    "<strong>1. Contextualize:</strong> Apresente a situação de forma neutra.",
-                    "<strong>2. Impacto:</strong> Explique o impacto gerado pela ação.",
-                    "<strong>3. Faça Perguntas:</strong> Estimule a reflexão com perguntas abertas.",
-                    "<strong>4. Consequências:</strong> Alerte sobre as consequências futuras se o comportamento persistir."
-                ],
-                iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C9.24 2 7 4.24 7 7c0 2.24 1.5 4.13 3.53 4.75L9 13v1h6v-1l-1.53-1.25C15.5 11.13 17 9.24 17 7c0-2.76-2.24-5-5-5zm-2 5c0-1.66 1.34-3 3-3s3 1.34 3 3-1.34 3-3 3-3-1.34-3-3zm2 8h-2v2h2v-2zm4 0h-2v2h2v-2zm-2 4h-2v2h2v-2z"/></svg>`
-            },
-            "Feedback Atitudinal": {
-                title: "Feedback Atitudinal",
-                howTo: [
-                    "<strong>1. Situação:</strong> Descreva o contexto específico.",
-                    "<strong>2. Comportamento Observado:</strong> Fale sobre a atitude de forma factual.",
-                    "<strong>3. Impacto:</strong> Explique como a atitude impactou a equipa ou o ambiente.",
-                    "<strong>4. Comportamento Esperado:</strong> Deixe claro qual é a atitude alinhada à cultura."
-                ],
-                iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-5-6c.78 2.34 2.72 4 5 4s4.22-1.66 5-4H7zm-1.5-2C6.2 10.67 7.5 10 9 10s2.8.67 3.5 2h-7zm9 0c.7-1.33 2-2 3.5-2s2.8.67 3.5 2h-7z"/></svg>`
-            },
-            "Ajustando a Rota": {
-                title: "Ajustando a Rota",
-                howTo: [
-                    "<strong>1. Comportamento Observado:</strong> Descreva o fato, sem julgamentos.",
-                    "<strong>2. Expectativas Claras:</strong> Comunique o que era esperado.",
-                    "<strong>3. Feedback Construtivo:</strong> Sugira como o comportamento pode ser ajustado.",
-                    "<strong>4. Impacto:</strong> Mostre o impacto da ação nos resultados.",
-                    "<strong>5. Metas e Acompanhamento:</strong> Definam juntos os próximos passos."
-                ],
-                iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2zm8.8-11.2l-1.42 1.42C19.37 8.63 20 10.24 20 12c0 2.22-1.21 4.15-3 5.19V15h-2v4h4v-2h-1.82c1.83-1.23 3-3.36 3-5.79 0-2.03-.79-3.88-2.08-5.27z"/></svg>`
-            },
-            "Feedback Ponto B": {
-                title: "Feedback Ponto B",
-                howTo: [
-                    "<strong>1. Performance Atual (Ponto A):</strong> Descreva o resultado atual.",
-                    "<strong>2. Resultado Esperado (Ponto B):</strong> Mostre claramente a meta desejada.",
-                    "<strong>3. Apoie com Ferramentas:</strong> Ofereça ajuda, recursos e treino.",
-                    "<strong>4. Acompanhe e Reconheça:</strong> Monitore o progresso e celebre os avanços."
-                ],
-                iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-4-8.5l4-4 4 4H8.5z"/></svg>`
-            },
-            "Prepare uma Conversa Difícil": {
-                title: "Prepare uma Conversa Difícil",
-                howTo: [
-                    "<strong>1. Preparação:</strong> Defina o objetivo claro da conversa e reúna os factos.",
-                    "<strong>2. Descreva o Fato:</strong> Apresente a situação objetivamente, sem julgamentos.",
-                    "<strong>3. Impacto e Consequência:</strong> Mostre o que o comportamento causou.",
-                    "<strong>4. Defina a Mudança:</strong> Comunique a expectativa clara para o futuro.",
-                    "<strong>5. Acompanhamento:</strong> Combine como o progresso será verificado e documente."
-                ],
-                iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 16h2v-2h-2v2zm0-4h2V7h-2v6z"/></svg>`
-            },
-            "Feedback da Gratidão": {
-                title: "Feedback da Gratidão",
-                howTo: [
-                    "<strong>1. Seja Intencional:</strong> Não espere um grande feito.",
-                    "<strong>2. Agradeça Diretamente:</strong> Expresse a sua gratidão.",
-                    "<strong>3. Seja Específico:</strong> Diga exatamente pelo que você está grato."
-                ],
-                iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`
-            },
-            "Feedback de Contratualização de Resultados": {
-                title: "Contratualização de Resultados",
-                howTo: [
-                    "<strong>1. Preparação:</strong> Reúna dados, metas e resultados.",
-                    "<strong>2. Início Empático:</strong> Crie um ambiente seguro e de parceria.",
-                    "<strong>3. Orientação:</strong> Apresente a performance atual e as metas futuras.",
-                    "<strong>4. Defina o Contrato:</strong> Acordem juntos os indicadores, prazos e responsabilidades.",
-                    "<strong>5. Agende o Acompanhamento:</strong> Marque as próximas conversas de alinhamento."
-                ],
-                iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 13h-2v-2h2v2zm0-4h-2V9h2v2zm-2-4H9V3.5L14.5 9H11z"/></svg>`
-            },
-            "Feedback da Celebração": {
-                title: "Feedback da Celebração",
-                howTo: [
-                    "<strong>1. Seja Intencional:</strong> Planeie o momento do reconhecimento.",
-                    "<strong>2. Comemore:</strong> Celebre a conquista de forma genuína.",
-                    "<strong>3. Reconheça Publicamente:</strong> Se apropriado, elogie na frente da equipa."
-                ],
-                iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm0 15l-3.5-3.5 1.41-1.41L12 15.17l5.09-5.09L18.5 11.5 12 18z"/></svg>`
-            }
+            "Reconheça o Menor Progresso": { title: "Reconheça o Menor Progresso", howTo: ["<strong>1. Elogio Inicial:</strong> Elogie o esforço e a dedicação.", "<strong>2. Reconhecimento do Impacto:</strong> Mostre como o pequeno avanço já ajudou.", "<strong>3. Reforço Positivo:</strong> Incentive a pessoa a continuar no caminho certo."], iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 3H3v18h18V3zM8 17H6v-7h2v7zm4 0h-2v-4h2v4zm4 0h-2V8h2v9z"/></svg>` },
+            "Feedback Big Mac": { title: "Feedback Big Mac", howTo: ["<strong>1. Elogio Genuíno:</strong> Comece com um ponto forte específico.", "<strong>2. Ponto de Melhoria:</strong> Apresente o ponto a ser desenvolvido de forma clara.", "<strong>3. Reforço Positivo:</strong> Termine com uma palavra de incentivo e confiança."], iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 13V11H5V13H19ZM19 7V5H5V7H19ZM21 15H3V14C3 12.9 3.9 12 5 12H19C20.1 12 21 12.9 21 14V15ZM21 9H3V8C3 6.9 3.9 6 5 6H19C20.1 6 21 6.9 21 8V9ZM21 17H3V19H21V17Z"/></svg>` },
+            "Feedback da Autonomia": { title: "Feedback da Autonomia", howTo: ["<strong>1. Contextualize:</strong> Apresente a situação de forma neutra.", "<strong>2. Impacto:</strong> Explique o impacto gerado pela ação.", "<strong>3. Faça Perguntas:</strong> Estimule a reflexão com perguntas abertas.", "<strong>4. Consequências:</strong> Alerte sobre as consequências futuras se o comportamento persistir."], iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C9.24 2 7 4.24 7 7c0 2.24 1.5 4.13 3.53 4.75L9 13v1h6v-1l-1.53-1.25C15.5 11.13 17 9.24 17 7c0-2.76-2.24-5-5-5zm-2 5c0-1.66 1.34-3 3-3s3 1.34 3 3-1.34 3-3 3-3-1.34-3-3zm2 8h-2v2h2v-2zm4 0h-2v2h2v-2zm-2 4h-2v2h2v-2z"/></svg>` },
+            "Feedback Atitudinal": { title: "Feedback Atitudinal", howTo: ["<strong>1. Situação:</strong> Descreva o contexto específico.", "<strong>2. Comportamento Observado:</strong> Fale sobre a atitude de forma factual.", "<strong>3. Impacto:</strong> Explique como a atitude impactou a equipa ou o ambiente.", "<strong>4. Comportamento Esperado:</strong> Deixe claro qual é a atitude alinhada à cultura."], iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-5-6c.78 2.34 2.72 4 5 4s4.22-1.66 5-4H7zm-1.5-2C6.2 10.67 7.5 10 9 10s2.8.67 3.5 2h-7zm9 0c.7-1.33 2-2 3.5-2s2.8.67 3.5 2h-7z"/></svg>` },
+            "Ajustando a Rota": { title: "Ajustando a Rota", howTo: ["<strong>1. Comportamento Observado:</strong> Descreva o fato, sem julgamentos.", "<strong>2. Expectativas Claras:</strong> Comunique o que era esperado.", "<strong>3. Feedback Construtivo:</strong> Sugira como o comportamento pode ser ajustado.", "<strong>4. Impacto:</strong> Mostre o impacto da ação nos resultados.", "<strong>5. Metas e Acompanhamento:</strong> Definam juntos os próximos passos."], iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2zm8.8-11.2l-1.42 1.42C19.37 8.63 20 10.24 20 12c0 2.22-1.21 4.15-3 5.19V15h-2v4h4v-2h-1.82c1.83-1.23 3-3.36 3-5.79 0-2.03-.79-3.88-2.08-5.27z"/></svg>` },
+            "Feedback Ponto B": { title: "Feedback Ponto B", howTo: ["<strong>1. Performance Atual (Ponto A):</strong> Descreva o resultado atual.", "<strong>2. Resultado Esperado (Ponto B):</strong> Mostre claramente a meta desejada.", "<strong>3. Apoie com Ferramentas:</strong> Ofereça ajuda, recursos e treino.", "<strong>4. Acompanhe e Reconheça:</strong> Monitore o progresso e celebre os avanços."], iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-4-8.5l4-4 4 4H8.5z"/></svg>` },
+            "Prepare uma Conversa Difícil": { title: "Prepare uma Conversa Difícil", howTo: ["<strong>1. Preparação:</strong> Defina o objetivo claro da conversa e reúna os factos.", "<strong>2. Descreva o Fato:</strong> Apresente a situação objetivamente, sem julgamentos.", "<strong>3. Impacto e Consequência:</strong> Mostre o que o comportamento causou.", "<strong>4. Defina a Mudança:</strong> Comunique a expectativa clara para o futuro.", "<strong>5. Acompanhamento:</strong> Combine como o progresso será verificado e documente."], iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 16h2v-2h-2v2zm0-4h2V7h-2v6z"/></svg>` },
+            "Feedback da Gratidão": { title: "Feedback da Gratidão", howTo: ["<strong>1. Seja Intencional:</strong> Não espere um grande feito.", "<strong>2. Agradeça Diretamente:</strong> Expresse a sua gratidão.", "<strong>3. Seja Específico:</strong> Diga exatamente pelo que você está grato."], iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>` },
+            "Feedback de Contratualização de Resultados": { title: "Contratualização de Resultados", howTo: ["<strong>1. Preparação:</strong> Reúna dados, metas e resultados.", "<strong>2. Início Empático:</strong> Crie um ambiente seguro e de parceria.", "<strong>3. Orientação:</strong> Apresente a performance atual e as metas futuras.", "<strong>4. Defina o Contrato:</strong> Acordem juntos os indicadores, prazos e responsabilidades.", "<strong>5. Agende o Acompanhamento:</strong> Marque as próximas conversas de alinhamento."], iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 13h-2v-2h2v2zm0-4h-2V9h2v2zm-2-4H9V3.5L14.5 9H11z"/></svg>` },
+            "Feedback da Celebração": { title: "Feedback da Celebração", howTo: ["<strong>1. Seja Intencional:</strong> Planeie o momento do reconhecimento.", "<strong>2. Comemore:</strong> Celebre a conquista de forma genuína.", "<strong>3. Reconheça Publicamente:</strong> Se apropriado, elogie na frente da equipa."], iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm0 15l-3.5-3.5 1.41-1.41L12 15.17l5.09-5.09L18.5 11.5 12 18z"/></svg>` }
         };
-
-        // Base de dados de Situações para os cards e para a IA
         const situationsData = [
-            { application: "Colaborador inseguro ao assumir nova responsabilidade.", script: "Reconheça o Menor Progresso" },
-            { application: "Entregou a tarefa com qualidade, mas ultrapassou o prazo.", script: "Feedback Big Mac" },
-            { application: "Tomou uma decisão sem comunicar, gerando retrabalho.", script: "Feedback da Autonomia" },
-            { application: "Funcionário com bom desempenho, mas muito crítico com colegas.", script: "Feedback Atitudinal" },
-            { application: "Liderado que não participa das reuniões de forma ativa.", script: "Ajustando a Rota" },
-            { application: "Entregou um projeto excelente, mas sem registar aprendizados.", script: "Feedback Ponto B" },
-            { application: "Liderado muito técnico, mas com dificuldade de comunicação.", script: "Feedback Ponto B" },
-            { application: "Pessoa nova que cometeu um erro por falta de orientação.", script: "Feedback Big Mac" },
-            { application: "Colaborador sobrecarregado que não delega.", script: "Feedback da Autonomia" },
-            { application: "Liderado que apresenta resistência a mudanças.", script: "Ajustando a Rota" },
-            { application: "Equipa confusa por falta de clareza de papéis do gestor.", script: "Feedback Ponto B" }, // Contexto: ao gestor
-            { application: "Pessoa que faz muito, mas não prioriza bem.", script: "Feedback da Autonomia" },
-            { application: "Liderado com atitude proativa e bons resultados.", script: "Feedback da Celebração" }, // Contexto: ao gestor
-            { application: "Falta de colaboração entre membros da equipa, com alguns a agirem como líderes informais.", script: "Prepare uma Conversa Difícil" },
-            { application: "Liderado que evita dar opinião por medo de errar.", script: "Feedback Big Mac" },
-            { application: "Funcionário que entrega tudo “no limite” sem planear.", script: "Feedback Atitudinal" },
-            { application: "Pessoa excelente tecnicamente, mas que não se posiciona.", script: "Feedback Big Mac" },
-            { application: "Liderado que perdeu o prazo e ficou em silêncio.", script: "Prepare uma Conversa Difícil" },
-            { application: "Colaborador destaca-se, mas não partilha conhecimento.", script: "Feedback Atitudinal" },
-            { application: "Membro da equipa demonstrou comportamento desrespeitoso.", script: "Prepare uma Conversa Difícil" },
-            { application: "A colaboradora aceitou coordenar um evento com pouco tempo e entregou com dedicação.", script: "Feedback da Gratidão" },
-            { application: "Durante uma ausência da líder, um membro da equipa assumiu responsabilidades extras.", script: "Feedback da Gratidão" },
-            { application: "Iniciou-se o ciclo de gestão do desempenho e a líder precisa de conversar com cada membro.", script: "Feedback de Contratualização de Resultados" },
-            { application: "A colaboradora tem-se destacado e você deseja prepará-la para um cargo maior.", script: "Feedback de Contratualização de Resultados" },
-            { application: "Um colaborador que costumava centralizar começou a delegar pequenas atividades.", script: "Reconheça o Menor Progresso" },
-            { application: "Uma colaboradora, normalmente tímida, falou com firmeza pela primeira vez numa reunião.", script: "Reconheça o Menor Progresso" },
-            { application: "A colaboradora apresentou um projeto para a alta liderança e saiu-se muito bem.", script: "Feedback da Celebração" },
-            { application: "A equipa concluiu uma etapa crítica do projeto.", script: "Feedback da Celebração" }
+            { application: "Colaborador inseguro ao assumir nova responsabilidade.", script: "Reconheça o Menor Progresso" }, { application: "Entregou a tarefa com qualidade, mas ultrapassou o prazo.", script: "Feedback Big Mac" }, { application: "Tomou uma decisão sem comunicar, gerando retrabalho.", script: "Feedback da Autonomia" }, { application: "Funcionário com bom desempenho, mas muito crítico com colegas.", script: "Feedback Atitudinal" }, { application: "Liderado que não participa das reuniões de forma ativa.", script: "Ajustando a Rota" }, { application: "Entregou um projeto excelente, mas sem registar aprendizados.", script: "Feedback Ponto B" }, { application: "Liderado muito técnico, mas com dificuldade de comunicação.", script: "Feedback Ponto B" }, { application: "Pessoa nova que cometeu um erro por falta de orientação.", script: "Feedback Big Mac" }, { application: "Colaborador sobrecarregado que não delega.", script: "Feedback da Autonomia" }, { application: "Liderado que apresenta resistência a mudanças.", script: "Ajustando a Rota" }, { application: "Equipa confusa por falta de clareza de papéis do gestor.", script: "Feedback Ponto B" }, { application: "Pessoa que faz muito, mas não prioriza bem.", script: "Feedback da Autonomia" }, { application: "Liderado com atitude proativa e bons resultados.", script: "Feedback da Celebração" }, { application: "Falta de colaboração entre membros da equipa, com alguns a agirem como líderes informais.", script: "Prepare uma Conversa Difícil" }, { application: "Liderado que evita dar opinião por medo de errar.", script: "Feedback Big Mac" }, { application: "Funcionário que entrega tudo “no limite” sem planear.", script: "Feedback Atitudinal" }, { application: "Pessoa excelente tecnicamente, mas que não se posiciona.", script: "Feedback Big Mac" }, { application: "Liderado que perdeu o prazo e ficou em silêncio.", script: "Prepare uma Conversa Difícil" }, { application: "Colaborador destaca-se, mas não partilha conhecimento.", script: "Feedback Atitudinal" }, { application: "Membro da equipa demonstrou comportamento desrespeitoso.", script: "Prepare uma Conversa Difícil" }, { application: "A colaboradora aceitou coordenar um evento com pouco tempo e entregou com dedicação.", script: "Feedback da Gratidão" }, { application: "Durante uma ausência da líder, um membro da equipa assumiu responsabilidades extras.", script: "Feedback da Gratidão" }, { application: "Iniciou-se o ciclo de gestão do desempenho e a líder precisa de conversar com cada membro.", script: "Feedback de Contratualização de Resultados" }, { application: "A colaboradora tem-se destacado e você deseja prepará-la para um cargo maior.", script: "Feedback de Contratualização de Resultados" }, { application: "Um colaborador que costumava centralizar começou a delegar pequenas atividades.", script: "Reconheça o Menor Progresso" }, { application: "Uma colaboradora, normalmente tímida, falou com firmeza pela primeira vez numa reunião.", script: "Reconheça o Menor Progresso" }, { application: "A colaboradora apresentou um projeto para a alta liderança e saiu-se muito bem.", script: "Feedback da Celebração" }, { application: "A equipa concluiu uma etapa crítica do projeto.", script: "Feedback da Celebração" }
         ];
 
-        const gameBoard = document.getElementById('game-board');
         let currentRecommendedFeedback = null;
+        
+        // --- LÓGICA GERAL E DAS ABAS ---
+        const tabs = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
 
-        function createCard(situation, index) {
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(item => item.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const target = tab.getAttribute('data-tab');
+                tabContents.forEach(content => {
+                    content.id === target ? content.classList.add('active') : content.classList.remove('active');
+                });
+            });
+        });
+
+        // --- LÓGICA V1.0 (EXPLORAR) ---
+        const gameBoardV1 = document.getElementById('game-board-v1');
+        const searchInputV1 = document.getElementById('search-input-v1');
+        const noResultsMessageV1 = document.getElementById('no-results-v1');
+
+        function createCardV1(situation) {
             const script = feedbackScripts[situation.script];
             if (!script) return; 
 
             const scene = document.createElement('div');
-            scene.className = 'scene h-[28rem]'; 
+            scene.className = 'scene-v1 h-[28rem]'; 
             scene.dataset.situation = situation.application.toLowerCase(); 
 
             const card = document.createElement('div');
-            card.className = 'card';
+            card.className = 'card-v1';
 
             const front = document.createElement('div');
-            front.className = 'card__face card__face--front';
-            front.innerHTML = `
-                <h4>SITUAÇÃO</h4>
-                <p>${situation.application}</p>
-            `;
+            front.className = 'card__face-v1 card__face--front-v1';
+            front.innerHTML = `<h4>SITUAÇÃO</h4><p>${situation.application}</p>`;
 
             const back = document.createElement('div');
-            back.className = 'card__face card__face--back';
+            back.className = 'card__face-v1 card__face--back-v1';
             const howToList = script.howTo.map(step => `<li>${step}</li>`).join('');
-            back.innerHTML = `
-                <div class="card-content-wrapper">
-                    <div class="flex items-center w-full mb-4 pb-3 border-b border-white/20">
-                        <div class="card-icon w-8 h-8 mr-3">${script.iconSvg}</div>
-                        <h4 class="m-0">${script.title}</h4>
-                    </div>
-                    <ul>${howToList}</ul>
-                </div>
-            `;
+            back.innerHTML = `<div class="card-content-wrapper-v1"><div class="flex items-center w-full mb-4 pb-3 border-b border-white/20"><div class="card-icon-v1 w-8 h-8 mr-3">${script.iconSvg}</div><h4 class="m-0">${script.title}</h4></div><ul>${howToList}</ul></div>`;
 
             card.appendChild(front);
             card.appendChild(back);
             scene.appendChild(card);
-
-            card.addEventListener('click', () => {
-                card.classList.toggle('is-flipped');
-            });
-
-            gameBoard.appendChild(scene);
+            card.addEventListener('click', () => card.classList.toggle('is-flipped'));
+            gameBoardV1.appendChild(scene);
         }
+        situationsData.forEach(createCardV1);
 
-        situationsData.forEach(createCard);
-        
-        // --- Lógica do Filtro ---
-        const searchInput = document.getElementById('search-input');
-        const noResultsMessage = document.getElementById('no-results');
-        searchInput.addEventListener('input', (e) => {
+        searchInputV1.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
-            const allCards = document.querySelectorAll('#game-board .scene');
+            const allCards = document.querySelectorAll('#game-board-v1 .scene-v1');
             let visibleCards = 0;
             allCards.forEach(card => {
                 const situationText = card.dataset.situation;
@@ -425,16 +413,109 @@
                     card.style.display = 'none';
                 }
             });
-
-            if (visibleCards === 0) {
-                noResultsMessage.classList.remove('hidden');
-            } else {
-                noResultsMessage.classList.add('hidden');
-            }
+            noResultsMessageV1.classList.toggle('hidden', visibleCards > 0);
         });
 
-        // --- Lógica da API Gemini ---
+        // --- LÓGICA V2.0 (JOGAR) ---
+        const gameBoardV2 = document.getElementById('game-board-v2');
+        const resetButtonV2 = document.getElementById('reset-button-v2');
+        let selectedCard = null;
+        let lockBoardV2 = false;
+        let pairsFoundV2 = 0;
+
+        function initializeGameV2() {
+            gameBoardV2.innerHTML = '';
+            resetButtonV2.classList.add('hidden');
+            pairsFoundV2 = 0;
+            let gameCards = [];
+            selectedCard = null;
+            lockBoardV2 = false;
+
+            const shuffledSituations = [...situationsData].sort(() => 0.5 - Math.random());
+            const gameSituations = shuffledSituations.slice(0, 6);
+
+            gameSituations.forEach((situation, index) => {
+                gameCards.push({ type: 'situation', content: situation.application, pairId: index });
+                gameCards.push({ type: 'technique', content: situation.script, pairId: index });
+            });
+
+            gameCards.sort(() => 0.5 - Math.random()).forEach(createGameCardV2);
+        }
+
+        function createGameCardV2(cardData) {
+            const scene = document.createElement('div');
+            scene.className = 'scene-v2 h-64';
+            const cardElement = document.createElement('div');
+            cardElement.classList.add('card-v2');
+            cardElement.dataset.pairId = cardData.pairId;
+            cardElement.dataset.type = cardData.type;
+            
+            const frontFace = document.createElement('div');
+            frontFace.className = 'card__face-v2 card__face--front-v2';
+            frontFace.innerHTML = `<h4>${cardData.type === 'situation' ? 'SITUAÇÃO' : 'TÉCNICA'}</h4><p>${cardData.content}</p>`;
+            
+            const backFace = document.createElement('div');
+            backFace.className = 'card__face-v2 card__face--back-v2';
+            backFace.innerHTML = `<p>Parabéns, você acertou e está mais perto de se tornar uma líder de impacto!</p>`;
+
+            cardElement.appendChild(frontFace);
+            cardElement.appendChild(backFace);
+            scene.appendChild(cardElement);
+            gameBoardV2.appendChild(scene);
+            cardElement.addEventListener('click', cardClickHandlerV2);
+        }
+
+        function cardClickHandlerV2() {
+            if (lockBoardV2 || this.classList.contains('is-matched') || this === selectedCard) return;
+
+            this.classList.add('selected');
+
+            if (!selectedCard) {
+                selectedCard = this;
+            } else {
+                lockBoardV2 = true;
+                checkForMatchV2(selectedCard, this);
+                selectedCard = null;
+            }
+        }
+
+        function checkForMatchV2(card1, card2) {
+            const isPair = card1.dataset.pairId === card2.dataset.pairId;
+            const isDifferentType = card1.dataset.type !== card2.dataset.type;
+
+            if (isPair && isDifferentType) {
+                handleCorrectMatchV2(card1, card2);
+            } else {
+                handleWrongMatchV2(card1, card2);
+            }
+        }
+
+        function handleCorrectMatchV2(card1, card2) {
+            card1.classList.add('correct-match', 'is-flipped', 'is-matched');
+            card2.classList.add('correct-match', 'is-flipped', 'is-matched');
+            card1.removeEventListener('click', cardClickHandlerV2);
+            card2.removeEventListener('click', cardClickHandlerV2);
+            pairsFoundV2++;
+            if (pairsFoundV2 === 6) {
+                setTimeout(() => resetButtonV2.classList.remove('hidden'), 1000);
+            }
+            lockBoardV2 = false;
+        }
+
+        function handleWrongMatchV2(card1, card2) {
+            card1.classList.add('wrong-match');
+            card2.classList.add('wrong-match');
+            setTimeout(() => {
+                card1.classList.remove('selected', 'wrong-match');
+                card2.classList.remove('selected', 'wrong-match');
+                lockBoardV2 = false;
+            }, 1200);
+        }
         
+        resetButtonV2.addEventListener('click', initializeGameV2);
+        initializeGameV2();
+
+        // --- LÓGICA DA API GEMINI (COMUM) ---
         const recommendationButton = document.getElementById('recommendation-button');
         const recommendationOutput = document.getElementById('recommendation-output');
         const situationInput = document.getElementById('situation-input');
@@ -458,12 +539,7 @@
             
             const payload = {
                 contents: [{ role: "user", parts: [{ text: prompt }] }],
-                generationConfig: {
-                    temperature: 0.2,
-                    topK: 1,
-                    topP: 1,
-                    maxOutputTokens: 2048,
-                },
+                generationConfig: { temperature: 0.2, topK: 1, topP: 1, maxOutputTokens: 2048 },
             };
 
             try {
@@ -472,18 +548,13 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-
-                if (!response.ok) {
-                    throw new Error(`API Error: ${response.statusText}`);
-                }
-
+                if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
                 const result = await response.json();
-                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
+                if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
                     return result.candidates[0].content.parts[0].text;
-                } else {
-                    console.error("Resposta da API em formato inesperado:", result);
-                    return null;
                 }
+                console.error("Resposta da API em formato inesperado:", result);
+                return null;
             } catch (error) {
                 console.error("Erro ao chamar a API Gemini:", error);
                 return null;
@@ -515,17 +586,7 @@
             recommendationOutput.classList.remove('hidden');
             recommendationOutput.innerHTML = '<p>A analisar a sua situação...</p>';
 
-            const prompt = `Aja como um especialista em liderança. A sua tarefa é recomendar a melhor técnica de feedback para uma situação descrita pelo utilizador.
-
-Base de Conhecimento:
-${knowledgeBase}
-
-Situação do Utilizador: "${inputText}"
-
-Com base na situação do utilizador, qual das seguintes técnicas é a mais apropriada? [${Object.keys(feedbackScripts).join(', ')}].
-Responda no formato:
-TÉCNICA: [Nome da Técnica]
-JUSTIFICAÇÃO: [Explicação concisa do porquê desta técnica ser a melhor, baseada na base de conhecimento].`;
+            const prompt = `Aja como um especialista em liderança. A sua tarefa é recomendar a melhor técnica de feedback para uma situação descrita pelo utilizador.\n\nBase de Conhecimento:\n${knowledgeBase}\n\nSituação do Utilizador: "${inputText}"\n\nCom base na situação do utilizador, qual das seguintes técnicas é a mais apropriada? [${Object.keys(feedbackScripts).join(', ')}].\nResponda no formato:\nTÉCNICA: [Nome da Técnica]\nJUSTIFICAÇÃO: [Explicação concisa do porquê desta técnica ser a melhor, baseada na base de conhecimento].`;
             
             const responseText = await callGemini(prompt);
             showLoading(recommendationButton, false);
@@ -533,23 +594,17 @@ JUSTIFICAÇÃO: [Explicação concisa do porquê desta técnica ser a melhor, ba
             if (responseText) {
                 const techMatch = responseText.match(/TÉCNICA:\s*(.*)/);
                 const justMatch = responseText.match(/JUSTIFICAÇÃO:\s*(.*)/);
-                
                 const recommendedTech = techMatch ? techMatch[1].trim() : null;
                 const justification = justMatch ? justMatch[1].trim() : "Não foi possível extrair a justificação.";
-
                 const bestMatch = feedbackScripts[recommendedTech];
 
                 if (bestMatch) {
                     currentRecommendedFeedback = { ...bestMatch, application: inputText };
-                    recommendationOutput.innerHTML = `
-                        <h4 class="font-bold text-lg">Recomendação: ${bestMatch.title}</h4>
-                        <p class="mt-2">${justification}</p>
-                        <p class="mt-2">Vire o card correspondente acima para ver o passo a passo detalhado!</p>
-                    `;
+                    recommendationOutput.innerHTML = `<h4 class="font-bold text-lg">Recomendação: ${bestMatch.title}</h4><p class="mt-2">${justification}</p>`;
                     simulatorContext.innerHTML = `<strong>Contexto da Simulação:</strong> A dar um feedback de <strong>${bestMatch.title}</strong> sobre a situação: <i>"${inputText}"</i>`;
                     simulatorSection.classList.remove('hidden');
                 } else {
-                    recommendationOutput.innerHTML = `<p>Não consegui identificar uma técnica específica para a sua situação. A resposta da IA foi: "${responseText}". Tente reformular a sua descrição.</p>`;
+                    recommendationOutput.innerHTML = `<p>Não consegui identificar uma técnica específica para a sua situação. Tente reformular a sua descrição.</p>`;
                 }
             } else {
                 recommendationOutput.innerHTML = `<p>Ocorreu um erro ao obter a recomendação. Por favor, tente novamente.</p>`;
@@ -574,10 +629,7 @@ JUSTIFICAÇÃO: [Explicação concisa do porquê desta técnica ser a melhor, ba
             showLoading(simulationButton, false);
 
             if (responseText) {
-                simulationOutput.innerHTML = `
-                    <h4 class="font-bold text-lg">Possível Resposta do Colaborador:</h4>
-                    <p class="mt-2"><i>"${responseText}"</i></p>
-                `;
+                simulationOutput.innerHTML = `<h4 class="font-bold text-lg">Possível Resposta do Colaborador:</h4><p class="mt-2"><i>"${responseText}"</i></p>`;
             } else {
                 simulationOutput.innerHTML = `<p>Ocorreu um erro ao gerar a simulação. Por favor, tente novamente.</p>`;
             }
