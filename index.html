@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
@@ -223,7 +223,7 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
-        #recommender, #simulator {
+        #recommender {
             background-color: var(--dark-card);
             border: 1px solid var(--border-color);
         }
@@ -249,6 +249,17 @@
         .output-area p {
             color: var(--light-text);
         }
+        .output-area ul {
+            list-style-type: none;
+            padding: 0;
+            text-align: left;
+        }
+        .output-area li {
+            background: rgba(0,0,0,0.2);
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
         .loader {
             border: 2px solid #f3f3f3;
             border-top: 2px solid var(--primary-pink);
@@ -268,7 +279,8 @@
 <body class="p-4 sm:p-8">
 
     <div class="max-w-7xl mx-auto text-center mb-8">
-        <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-2">Feedback em 1 minuto</h1>
+        <img src="logoGL.jpeg" alt="Logo Método Lideração" class="h-28 mx-auto mb-4">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-2 -mt-4">Feedback em 1 minuto</h1>
         <p class="text-gray-400">Escolha o seu modo: Explore os cenários ou teste os seus conhecimentos no Jogo da Memória.</p>
     </div>
 
@@ -290,13 +302,23 @@
                         <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
                     </svg>
                 </div>
-                <input type="text" id="search-input-v1" class="w-full p-3 pl-10 border rounded-md focus:ring-2 transition input-area" placeholder="Pesquisar por uma situação...">
+                <input type="text" id="search-input-v1" class="w-full p-3 pl-10 border rounded-md focus:ring-2 transition input-area" placeholder="Pesquisar por contexto (ex: insegurança, atraso)...">
             </div>
         </div>
         <div id="game-board-v1" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
         <div id="no-results-v1" class="text-center text-gray-400 p-8 hidden mt-8">
             <h3 class="text-xl font-semibold text-white">Não encontrou a sua situação?</h3>
             <p class="mt-2">O recomendador com IA irá ajudá-lo! Descreva o seu caso abaixo.</p>
+        </div>
+        <!-- Seção de Recomendação (Apenas na V1) -->
+        <div id="recommender" class="max-w-4xl mx-auto mt-16 p-8 rounded-lg">
+            <h2 class="text-2xl font-bold text-center mb-2 text-white">✨ Recomendador de Feedback com IA</h2>
+            <p class="text-center text-gray-400 mb-6">Descreva a sua situação e a IA da Gemini irá sugerir a melhor técnica.</p>
+            <textarea id="situation-input" class="w-full p-3 border rounded-md focus:ring-2 transition input-area" rows="4" placeholder="Ex: 'Um membro da equipa entregou a tarefa com qualidade, mas uma semana depois do prazo...'"></textarea>
+            <div class="text-center mt-4">
+                <button id="recommendation-button" class="py-2 px-6 rounded-md gemini-button">Obter Recomendação</button>
+            </div>
+            <div id="recommendation-output" class="mt-6 p-4 border rounded-md hidden output-area"></div>
         </div>
     </div>
 
@@ -307,30 +329,6 @@
         </div>
     </div>
     
-    <!-- Seção de Recomendação (Comum) -->
-    <div id="recommender" class="max-w-4xl mx-auto mt-16 p-8 rounded-lg">
-        <h2 class="text-2xl font-bold text-center mb-2 text-white">✨ Recomendador de Feedback com IA</h2>
-        <p class="text-center text-gray-400 mb-6">Descreva a sua situação e a IA da Gemini irá sugerir a melhor técnica.</p>
-        <textarea id="situation-input" class="w-full p-3 border rounded-md focus:ring-2 transition input-area" rows="4" placeholder="Ex: 'Um membro da equipa entregou a tarefa com qualidade, mas uma semana depois do prazo...'"></textarea>
-        <div class="text-center mt-4">
-            <button id="recommendation-button" class="py-2 px-6 rounded-md gemini-button">Obter Recomendação</button>
-        </div>
-        <div id="recommendation-output" class="mt-6 p-4 border rounded-md hidden output-area"></div>
-    </div>
-
-    <!-- Seção do Simulador (Comum) -->
-    <div id="simulator" class="max-w-4xl mx-auto mt-8 p-8 rounded-lg hidden">
-        <h2 class="text-2xl font-bold text-center mb-2 text-white">✨ Simulador de Conversa com IA</h2>
-        <p class="text-center text-gray-400 mb-6">Pratique a sua abordagem. Escreva a sua frase de abertura abaixo.</p>
-        <div id="simulator-context" class="mb-4 p-3 bg-gray-800 rounded-md text-sm"></div>
-        <textarea id="user-opener-input" class="w-full p-3 border rounded-md focus:ring-2 transition input-area" rows="3" placeholder="Ex: 'Olá [Nome], podemos conversar um momento? Gostaria de falar sobre o projeto X...'"></textarea>
-        <div class="text-center mt-4">
-            <button id="simulation-button" class="py-2 px-6 rounded-md gemini-button">Simular Resposta</button>
-        </div>
-        <div id="simulation-output" class="mt-6 p-4 border rounded-md hidden output-area"></div>
-    </div>
-
-
     <script>
         // --- BASE DE CONHECIMENTO COMPLETA (PARA AMBAS AS VERSÕES) ---
         const feedbackScripts = {
@@ -349,8 +347,6 @@
             { application: "Colaborador inseguro ao assumir nova responsabilidade.", script: "Reconheça o Menor Progresso" }, { application: "Entregou a tarefa com qualidade, mas ultrapassou o prazo.", script: "Feedback Big Mac" }, { application: "Tomou uma decisão sem comunicar, gerando retrabalho.", script: "Feedback da Autonomia" }, { application: "Funcionário com bom desempenho, mas muito crítico com colegas.", script: "Feedback Atitudinal" }, { application: "Liderado que não participa das reuniões de forma ativa.", script: "Ajustando a Rota" }, { application: "Entregou um projeto excelente, mas sem registar aprendizados.", script: "Feedback Ponto B" }, { application: "Liderado muito técnico, mas com dificuldade de comunicação.", script: "Feedback Ponto B" }, { application: "Pessoa nova que cometeu um erro por falta de orientação.", script: "Feedback Big Mac" }, { application: "Colaborador sobrecarregado que não delega.", script: "Feedback da Autonomia" }, { application: "Liderado que apresenta resistência a mudanças.", script: "Ajustando a Rota" }, { application: "Equipa confusa por falta de clareza de papéis do gestor.", script: "Feedback Ponto B" }, { application: "Pessoa que faz muito, mas não prioriza bem.", script: "Feedback da Autonomia" }, { application: "Liderado com atitude proativa e bons resultados.", script: "Feedback da Celebração" }, { application: "Falta de colaboração entre membros da equipa, com alguns a agirem como líderes informais.", script: "Prepare uma Conversa Difícil" }, { application: "Liderado que evita dar opinião por medo de errar.", script: "Feedback Big Mac" }, { application: "Funcionário que entrega tudo “no limite” sem planear.", script: "Feedback Atitudinal" }, { application: "Pessoa excelente tecnicamente, mas que não se posiciona.", script: "Feedback Big Mac" }, { application: "Liderado que perdeu o prazo e ficou em silêncio.", script: "Prepare uma Conversa Difícil" }, { application: "Colaborador destaca-se, mas não partilha conhecimento.", script: "Feedback Atitudinal" }, { application: "Membro da equipa demonstrou comportamento desrespeitoso.", script: "Prepare uma Conversa Difícil" }, { application: "A colaboradora aceitou coordenar um evento com pouco tempo e entregou com dedicação.", script: "Feedback da Gratidão" }, { application: "Durante uma ausência da líder, um membro da equipa assumiu responsabilidades extras.", script: "Feedback da Gratidão" }, { application: "Iniciou-se o ciclo de gestão do desempenho e a líder precisa de conversar com cada membro.", script: "Feedback de Contratualização de Resultados" }, { application: "A colaboradora tem-se destacado e você deseja prepará-la para um cargo maior.", script: "Feedback de Contratualização de Resultados" }, { application: "Um colaborador que costumava centralizar começou a delegar pequenas atividades.", script: "Reconheça o Menor Progresso" }, { application: "Uma colaboradora, normalmente tímida, falou com firmeza pela primeira vez numa reunião.", script: "Reconheça o Menor Progresso" }, { application: "A colaboradora apresentou um projeto para a alta liderança e saiu-se muito bem.", script: "Feedback da Celebração" }, { application: "A equipa concluiu uma etapa crítica do projeto.", script: "Feedback da Celebração" }
         ];
 
-        let currentRecommendedFeedback = null;
-        
         // --- LÓGICA GERAL E DAS ABAS ---
         const tabs = document.querySelectorAll('.tab-button');
         const tabContents = document.querySelectorAll('.tab-content');
@@ -378,7 +374,7 @@
 
             const scene = document.createElement('div');
             scene.className = 'scene-v1 h-[28rem]'; 
-            scene.dataset.situation = situation.application.toLowerCase(); 
+            scene.dataset.situation = situation.application;
 
             const card = document.createElement('div');
             card.className = 'card-v1';
@@ -399,23 +395,7 @@
             gameBoardV1.appendChild(scene);
         }
         situationsData.forEach(createCardV1);
-
-        searchInputV1.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const allCards = document.querySelectorAll('#game-board-v1 .scene-v1');
-            let visibleCards = 0;
-            allCards.forEach(card => {
-                const situationText = card.dataset.situation;
-                if (situationText.includes(searchTerm)) {
-                    card.style.display = 'block';
-                    visibleCards++;
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-            noResultsMessageV1.classList.toggle('hidden', visibleCards > 0);
-        });
-
+        
         // --- LÓGICA V2.0 (JOGAR) ---
         const gameBoardV2 = document.getElementById('game-board-v2');
         const resetButtonV2 = document.getElementById('reset-button-v2');
@@ -467,9 +447,7 @@
 
         function cardClickHandlerV2() {
             if (lockBoardV2 || this.classList.contains('is-matched') || this === selectedCard) return;
-
             this.classList.add('selected');
-
             if (!selectedCard) {
                 selectedCard = this;
             } else {
@@ -482,12 +460,7 @@
         function checkForMatchV2(card1, card2) {
             const isPair = card1.dataset.pairId === card2.dataset.pairId;
             const isDifferentType = card1.dataset.type !== card2.dataset.type;
-
-            if (isPair && isDifferentType) {
-                handleCorrectMatchV2(card1, card2);
-            } else {
-                handleWrongMatchV2(card1, card2);
-            }
+            isPair && isDifferentType ? handleCorrectMatchV2(card1, card2) : handleWrongMatchV2(card1, card2);
         }
 
         function handleCorrectMatchV2(card1, card2) {
@@ -519,12 +492,7 @@
         const recommendationButton = document.getElementById('recommendation-button');
         const recommendationOutput = document.getElementById('recommendation-output');
         const situationInput = document.getElementById('situation-input');
-        const simulatorSection = document.getElementById('simulator');
-        const simulationButton = document.getElementById('simulation-button');
-        const simulationOutput = document.getElementById('simulation-output');
-        const userOpenerInput = document.getElementById('user-opener-input');
-        const simulatorContext = document.getElementById('simulator-context');
-
+        
         const knowledgeBase = Object.entries(feedbackScripts).map(([key, value]) => {
             const relevantSituations = situationsData
                 .filter(s => s.script === key)
@@ -535,11 +503,11 @@
 
         async function callGemini(prompt) {
             const apiKey = ""; 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
             
             const payload = {
                 contents: [{ role: "user", parts: [{ text: prompt }] }],
-                generationConfig: { temperature: 0.2, topK: 1, topP: 1, maxOutputTokens: 2048 },
+                generationConfig: { temperature: 0.2, topK: 1, topP: 1, maxOutputTokens: 4096 },
             };
 
             try {
@@ -582,7 +550,6 @@
             }
             
             showLoading(recommendationButton);
-            simulatorSection.classList.add('hidden');
             recommendationOutput.classList.remove('hidden');
             recommendationOutput.innerHTML = '<p>A analisar a sua situação...</p>';
 
@@ -599,10 +566,21 @@
                 const bestMatch = feedbackScripts[recommendedTech];
 
                 if (bestMatch) {
-                    currentRecommendedFeedback = { ...bestMatch, application: inputText };
-                    recommendationOutput.innerHTML = `<h4 class="font-bold text-lg">Recomendação: ${bestMatch.title}</h4><p class="mt-2">${justification}</p>`;
-                    simulatorContext.innerHTML = `<strong>Contexto da Simulação:</strong> A dar um feedback de <strong>${bestMatch.title}</strong> sobre a situação: <i>"${inputText}"</i>`;
-                    simulatorSection.classList.remove('hidden');
+                    const howToList = bestMatch.howTo.map(step => `<li>${step}</li>`).join('');
+                    recommendationOutput.innerHTML = `
+                        <h4 class="font-bold text-lg">Recomendação: ${bestMatch.title}</h4>
+                        <p class="mt-2">${justification}</p>
+                        <h5 class="font-bold text-md mt-4 text-white">Passo a passo sugerido:</h5>
+                        <ul class="mt-2">${howToList}</ul>
+                        <div class="text-center mt-4">
+                            <button id="reset-recommendation-button" class="py-1 px-4 rounded-md bg-gray-600 hover:bg-gray-500 transition">Zerar Pesquisa</button>
+                        </div>
+                    `;
+                    document.getElementById('reset-recommendation-button').addEventListener('click', () => {
+                        recommendationOutput.innerHTML = '';
+                        recommendationOutput.classList.add('hidden');
+                        situationInput.value = '';
+                    });
                 } else {
                     recommendationOutput.innerHTML = `<p>Não consegui identificar uma técnica específica para a sua situação. Tente reformular a sua descrição.</p>`;
                 }
@@ -610,29 +588,23 @@
                 recommendationOutput.innerHTML = `<p>Ocorreu um erro ao obter a recomendação. Por favor, tente novamente.</p>`;
             }
         });
-
-        simulationButton.addEventListener('click', async () => {
-            const userOpener = userOpenerInput.value.trim();
-            if (!currentRecommendedFeedback || userOpener === '') {
-                simulationOutput.innerHTML = '<p>Por favor, descreva a sua frase de abertura para iniciar a simulação.</p>';
-                simulationOutput.classList.remove('hidden');
-                return;
-            }
-
-            showLoading(simulationButton);
-            simulationOutput.classList.remove('hidden');
-            simulationOutput.innerHTML = '<p>A simular a resposta do colaborador...</p>';
-
-            const prompt = `Aja como um colaborador que está a receber um feedback. O meu gestor iniciou a conversa da seguinte forma: "${userOpener}". O contexto do feedback é sobre "${currentRecommendedFeedback.application}". O meu gestor está a usar a técnica "${currentRecommendedFeedback.title}". Gere uma resposta realista e concisa do colaborador a esta abertura.`;
-
-            const responseText = await callGemini(prompt);
-            showLoading(simulationButton, false);
-
-            if (responseText) {
-                simulationOutput.innerHTML = `<h4 class="font-bold text-lg">Possível Resposta do Colaborador:</h4><p class="mt-2"><i>"${responseText}"</i></p>`;
-            } else {
-                simulationOutput.innerHTML = `<p>Ocorreu um erro ao gerar a simulação. Por favor, tente novamente.</p>`;
-            }
+        
+        // --- NOVA LÓGICA DE PESQUISA SEMÂNTICA (SEM IA) ---
+        searchInputV1.addEventListener('input', (e) => {
+            const searchTerms = e.target.value.toLowerCase().split(' ').filter(Boolean);
+            const allCards = document.querySelectorAll('#game-board-v1 .scene-v1');
+            let visibleCards = 0;
+            allCards.forEach(card => {
+                const situationText = card.dataset.situation.toLowerCase();
+                const isMatch = searchTerms.length === 0 || searchTerms.some(term => situationText.includes(term));
+                if (isMatch) {
+                    card.style.display = 'block';
+                    visibleCards++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            noResultsMessageV1.classList.toggle('hidden', visibleCards > 0);
         });
 
     </script>
