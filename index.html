@@ -279,10 +279,15 @@
 </head>
 <body class="p-4 sm:p-8">
 
-    <div class="max-w-7xl mx-auto text-center mb-4">
-        <img src="logoGL.png" alt="Logo Método Lideração" class="h-40 sm:h-56 mx-auto">
-        <h1 class="text-3xl sm:text-4xl font-extrabold text-white -mt-2">Feedback em 1 minuto</h1>
-        <p class="text-gray-400 mt-1">Escolha o seu modo: Explore os cenários ou teste os seus conhecimentos no Jogo da Memória.</p>
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center sm:justify-between mb-4">
+        <div class="w-auto sm:w-1/4 flex-shrink-0">
+             <img src="logoGL.png" alt="Logo Método Lideração" class="h-48 sm:h-32 mx-auto sm:mx-0">
+        </div>
+        <div class="w-full sm:w-1/2 text-center mt-4 sm:mt-0">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-white">Feedback em 1 minuto</h1>
+            <p class="text-gray-400 mt-2">Escolha o seu modo: Explore os cenários ou teste os seus conhecimentos no Jogo da Memória.</p>
+        </div>
+        <div class="hidden sm:block sm:w-1/4"></div> <!-- Espaçador invisível para centralizar o título em telas maiores -->
     </div>
 
     <!-- Abas -->
@@ -509,7 +514,7 @@
             // NOTA PARA DEPLOYMENT: A chave de API está vazia ("") porque neste ambiente
             // ela é fornecida automaticamente. Para hospedar num site externo,
             // terá de obter a sua própria chave gratuita no Google AI Studio e colocá-la aqui.
-            const apiKey = ""; 
+            const apiKey = "AIzaSyCw_VCEPS0c0Vysm64SsFkaSMkFgJvyXpI"; 
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
             
             const payload = {
